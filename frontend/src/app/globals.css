@@ -2,32 +2,117 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+main {
+  width: 100%;
+  height: calc(100% - 88px); /* Adjust 88px to the total height of your navbar */
+  font-weight: 500;
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+h1 {
+  line-height: 1;
+  font-size: 127.88px;
+  padding: 0;
+  margin: 0;
+}
+
+h2 {
+  line-height: 1;
+  font-size: 63.96px;
+  padding: 0;
+  margin: 0;
+}
+
+p {
+  line-height: 1;
+  font-size: 16px;
+  padding: 0;
+  margin: 0;
+}
+
+.content-div {
+  width: 100%;
+  height: 100%;
+  background-color: #212922;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.content-div-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.content-div-new-plan-button {
+  opacity: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 150px;
+  height: 40px;
+  background-color: #D7263D;
+  border-radius: 10px;
+  color: #cfd7c7;
+}
+
+.content-div-subtitle:hover {
+  color: #fff;
+}
+
+.navbar-main {
+  width: 100%;
+  height: 88px;
+  padding-left: 50px;
+  padding-right: 50px;
+  background-color: #212922;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar-title-text {
+  color: #FFF;
+  font-size: 38px;
+  font-weight: 700;
+}
+
+.navbar-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+}
+
+.navbar-button {
+  color: #FFF;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.main-title {
+  opacity: 0;
+  font-size: 127.88px;
+}
+
+.sub-title {
+  opacity: 0;
+  font-size: 63.96px;
 }
