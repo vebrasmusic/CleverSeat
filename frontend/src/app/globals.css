@@ -1,51 +1,169 @@
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
+  @tailwind components;
+  @tailwind utilities;
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
-
-main {
-  width: 100%;
-  height: calc(100% - 88px); /* Adjust 88px to the total height of your navbar */
-  font-weight: 500;
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
   }
+  
+  main {
+    width: 100%;
+    height: calc(100% - 88px); /* Adjust 88px to the total height of your navbar */
+    font-weight: 500;
+  }
+  
+  @layer utilities {
+    .text-balance {
+      text-wrap: balance;
+    }
+  }
+  
+  h1 {
+    line-height: 1;
+    font-size: 127.88px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  h2 {
+    line-height: 1;
+    font-size: 63.96px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  p {
+    line-height: 1;
+    font-size: 16px;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .content-div {
+    width: 100%;
+    height: 100%;
+    background-color: #212922;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .content-div-title {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .content-div-new-plan-button {
+    opacity: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 40px;
+    background-color: #D7263D;
+    border-radius: 10px;
+    color: #cfd7c7;
+  }
+  
+  .content-div-subtitle:hover {
+    color: #fff;
+  }
+  
+  .navbar-main {
+    width: 100%;
+    height: 88px;
+    padding-left: 50px;
+    padding-right: 50px;
+    background-color: #212922;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .navbar-title-text {
+    color: #FFF;
+    font-size: 38px;
+    font-weight: 700;
+  }
+  
+  .navbar-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+  }
+  
+  .navbar-button {
+    color: #FFF;
+    font-size: 16px;
+    font-weight: 700;
+  }
+  
+  .main-title {
+    opacity: 0;
+    font-size: 127.88px;
+  }
+  
+  .sub-title {
+    opacity: 0;
+    font-size: 63.96px;
+  }
+
+  .config-div {
+    opacity: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+.config-div-title {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-h1 {
-  line-height: 1;
-  font-size: 127.88px;
-  padding: 0;
-  margin: 0;
+.config-card {
+  border-radius: 10px;
+  padding: 30px;
+  background-color: #cfd7c7;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-h2 {
-  line-height: 1;
-  font-size: 63.96px;
-  padding: 0;
-  margin: 0;
+.config-card-content {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
 }
 
-p {
-  line-height: 1;
-  font-size: 16px;
-  padding: 0;
-  margin: 0;
+.config-card-subdiv {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.content-div {
+.config-card-option {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.plan-div{
+  opacity: 0;
   width: 100%;
   height: 100%;
-  background-color: #212922;
-  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,66 +171,30 @@ p {
   gap: 10px;
 }
 
-.content-div-title {
+.plan-header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-}
-
-.content-div-new-plan-button {
-  opacity: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  width: 150px;
-  height: 40px;
-  background-color: #D7263D;
-  border-radius: 10px;
-  color: #cfd7c7;
-}
-
-.content-div-subtitle:hover {
-  color: #fff;
-}
-
-.navbar-main {
-  width: 100%;
-  height: 88px;
   padding-left: 50px;
   padding-right: 50px;
-  background-color: #212922;
-  display: flex;
+  width: 100%;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
 }
 
-.navbar-title-text {
-  color: #FFF;
-  font-size: 38px;
-  font-weight: 700;
-}
-
-.navbar-buttons {
+.plan-content-div {
   display: flex;
-  flex-direction: row;
-  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-.navbar-button {
-  color: #FFF;
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.main-title {
-  opacity: 0;
+.plan-input {
+  text-align: center;
+  width: 100%;
+  height: 100%;
   font-size: 127.88px;
-}
-
-.sub-title {
-  opacity: 0;
-  font-size: 63.96px;
+  background-color: transparent;
+  border: none;
+  outline: none;
 }

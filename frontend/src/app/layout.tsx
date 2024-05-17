@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "../components/navbar";
 
 const inter = Inter_Tight({ weight: "500", subsets: ["latin"] });
+import {NextUIProvider} from "@nextui-org/react";
+
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,6 +24,7 @@ export default function RootLayout({
           <Navbar />
           {children}
         </main>
+      
       </body>
     </html>
   );
