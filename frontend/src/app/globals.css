@@ -87,6 +87,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+    box-shadow: 0 4px 1px rgba(0, 0, 0, 1); /* Adjust shadow intensity and spread as needed */
+
   }
   
   .navbar-title-text {
@@ -198,3 +200,20 @@
   border: none;
   outline: none;
 }
+
+.plan-dialog-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.plan-relationship-dropdown-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+

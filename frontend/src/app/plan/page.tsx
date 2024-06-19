@@ -1,19 +1,16 @@
 'use client'
 
-import Link from "next/link";
 import { useRef } from 'react';
 import gsap from 'gsap'; // <-- import GSAP
 import { useGSAP } from '@gsap/react'; // <-- import the hook from our React package
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectLabel, SelectItem } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { LargeInput } from "@/components/ large_input";
-import { KeyboardIcon } from "@radix-ui/react-icons";
-import { useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { PeopleContext } from "@/context/peopleContext";
+
+import { Person, Relationship, RelationshipGraph } from "@/classes/people";
+import { RelationshipsContext } from "@/context/relationshipsContext";
+import { RelationshipDropdown } from "@/components/relationships/relationship_dropdown";
+
 import {
     Table,
     TableBody,
@@ -25,24 +22,29 @@ import {
   } from "@/components/ui/table"
   import {
     Dialog,
+    DialogClose,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
   } from "@/components/ui/dialog"
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { TypeDropdown } from '@/components/relationships/typeDropdown';
+
   
 export default function Plan() {
 
     const animationContainer = useRef<HTMLDivElement>(null);
-    const router = useRouter();
-    const [currentName, setCurrentName] = useState('');
-    const [names, setNames] = useState<string[]>([]);
+    const [currentName, setCurrentName] = useState(''); // this is just for the name not going away when they tab
+    const [relationshipGraph, setRelationshipGraph] = useState<RelationshipGraph>(new RelationshipGraph());
+    const [people, setPeople] = useState<Person[]>([]); //array of person objects
     const [isEditing, setIsEditing] = useState(false);
-
-    useEffect(() => {
-        console.log(currentName);
-    }, [currentName]);
+    const [editedIndex, setEditedIndex] = useState(0);
 
     useEffect(() => {
         const handleGlobalKeyPress = (event: KeyboardEvent) => {
@@ -57,7 +59,7 @@ export default function Plan() {
         return () => {
             window.removeEventListener('keydown', handleGlobalKeyPress);
         };
-    }, [isEditing]);
+    }, [isEditing]); // this use effect is for doing the tab to switch to edit mode
 
     const { contextSafe } = useGSAP({ scope: animationContainer });
      // we can pass in a config object as the 1st parameter to make scoping simple
@@ -73,36 +75,44 @@ export default function Plan() {
     }
     )
 
-    const onEditMode = contextSafe(() => {
-        gsap.to('.plan-div', { opacity: 1 });
-    });
+    const addPerson = (name: string) => {
+        const person = new Person(name, false);
+        setPeople(prevPeople => [...prevPeople, person]);
+    }
+
+    const removePerson = (index: number) => {
+        setPeople(prevPeople => prevPeople.filter((person, i) => i !== index));
+    }
 
     function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
-        const newValue = event.currentTarget.value;
+        const name = event.currentTarget.value;
 
-        setCurrentName(newValue); // Update state
+        setCurrentName(name); // Update state
 
-        // Extract last name from the current input
-        const lastName = newValue.split(' ').pop();
-
-        // Check if this last name is already in the list of names
-        const lastNameExists = names.some(name => name.split(' ').pop() === lastName);
-
-        if (lastNameExists) {
-            // Prompt the user
-            console.log(`Last name "${lastName}" already exists!`);
-        }
 
         if (event.key === "Enter") {
-            setNames([...names, event.currentTarget.value]);
-            setCurrentName('');
-            event.currentTarget.value = ''; // Clear the input field
-            // save the name to some storage
-        } 
+            if (name != '') {
+                addPerson(name); // this spreads the state and adds to it
+                toast.success('Added ' + name + ' to the seating plan.');
+                setCurrentName('');
+                event.currentTarget.value = ''; // Clear the input field
+            }
+        }
+    }
+
+    const handleDialogSave = () => {
+        if (currentName === '') {
+            return;
+        }
+        addPerson(currentName);
+        removePerson(editedIndex);
+        toast.success('Saved person.');
     }
 
   return (
     <div className="content-div" ref={animationContainer}>
+        <PeopleContext.Provider value={people}>
+        <RelationshipsContext.Provider value={relationshipGraph}>
         <div className="plan-div">
             {/* <div className="plan-header">
                 <div className="plan-header-item">
@@ -111,45 +121,78 @@ export default function Plan() {
             </div> */}
             {!isEditing ? (
                 <div className="plan-content-div">
-                    <input autoFocus className="plan-input" type="text" placeholder="start typing..." defaultValue={currentName} onKeyDown={handleKeyPress} />
+                    <input autoFocus className="plan-input" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleKeyPress} />
                     <div className="plan-header-item">
                         <p className="text-[#D7263D]">Press ⏎ to save this name.</p>
+                        <p className="text-[#D7263D]">Press Tab to see / edit your list of names.</p>
                     </div>
                 </div>
             ) : (
-                <div className="plan-content-div">
-                    <Table>
-                        <TableCaption>List of current names in your seating plan.</TableCaption>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Status</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {names.map((name) => (
-                                <TableRow key={name}>
-                                    <TableCell className="font-medium">
-                                        <Dialog>
-                                            <DialogTrigger>{name}</DialogTrigger>
-                                            <DialogContent>
-                                                <DialogHeader>
-                                                <DialogTitle>{name}</DialogTitle>
-                                                <DialogDescription>
-                                                    Edit the relationships.
-                                                </DialogDescription>
-                                                </DialogHeader>
-                                            </DialogContent>
-                                        </Dialog>
-                                    </TableCell>
-                                    <TableCell>Connected</TableCell>
+                    <ScrollArea className="plan-content-div">
+                        <Table className="plan-data-table">
+                            <TableCaption>Click each name to add relationships.</TableCaption>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Status</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </div>
+                            </TableHeader>
+                            <TableBody>
+                                {people.map((person, index) => (
+                                    <TableRow key={person.name}>
+                                        <TableCell className="font-medium pr-40">
+                                            <Dialog>
+                                                <DialogTrigger>{person.name}</DialogTrigger>
+                                                <DialogContent>
+                                                    <DialogHeader>
+                                                        <DialogTitle>
+                                                            <Input 
+                                                            className='w-[200px]' 
+                                                            defaultValue={person.name}
+                                                            type='text'
+                                                            onChange = {(event) => {
+                                                                setCurrentName(event.target.value);
+                                                                setEditedIndex(index);
+                                                            }}
+                                                            />
+                                                        </DialogTitle>
+                                                        <DialogDescription>
+                                                            Edit person details and relationships.
+                                                        </DialogDescription>
+                                                    </DialogHeader>
+                                                    <div className="plan-dialog-content">
+                                                        <div>
+                                                            something here
+                                                        </div>
+                                                        <ScrollArea>
+                                                            <div className="flex flex-row gap-4">
+                                                                <TypeDropdown/>
+                                                                <RelationshipDropdown/>
+                                                            </div>
+                                                        </ScrollArea>
+                                                    </div>
+                                                    <DialogFooter>
+                                                        <Button onClick = {() => {
+                                                            removePerson(index);
+                                                            toast.success('Deleted person.');
+                                                        }}>Delete</Button>
+                                                        <DialogClose>
+                                                            <Button onClick={handleDialogSave}>Save</Button>
+                                                        </DialogClose>
+                                                    </DialogFooter>
+                                                </DialogContent>
+                                            </Dialog>
+                                        </TableCell>
+                                        <TableCell>{person.isConnected ? 'Connected' : 'Not Connected'}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </ScrollArea>
             )}
         </div>
+        </RelationshipsContext.Provider>
+        </PeopleContext.Provider>
     </div>
   );
 }
