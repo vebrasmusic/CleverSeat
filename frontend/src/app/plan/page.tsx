@@ -121,7 +121,7 @@ export default function Plan() {
             </div> */}
             {!isEditing ? (
                 <div className="plan-content-div">
-                    <input autoFocus className="plan-input" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleKeyPress} />
+                    <input autoFocus className="w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleKeyPress} />
                     <div className="plan-header-item">
                         <p className="text-[#D7263D]">Press ⏎ to save this name.</p>
                         <p className="text-[#D7263D]">Press Tab to see / edit your list of names.</p>

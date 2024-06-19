@@ -191,16 +191,6 @@
   gap: 10px;
 }
 
-.plan-input {
-  text-align: center;
-  width: 100%;
-  height: 100%;
-  font-size: 127.88px;
-  background-color: transparent;
-  border: none;
-  outline: none;
-}
-
 .plan-dialog-content {
   width: 100%;
   height: 100%;
