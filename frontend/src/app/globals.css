@@ -1,6 +1,6 @@
 @tailwind base;
-  @tailwind components;
-  @tailwind utilities;
+@tailwind components;
+@tailwind utilities;
 
   html, body {
     height: 100%;
@@ -87,8 +87,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 0 4px 1px rgba(0, 0, 0, 1); /* Adjust shadow intensity and spread as needed */
-
+    border-bottom: 0.3px solid #D9D9D9;
   }
   
   .navbar-title-text {

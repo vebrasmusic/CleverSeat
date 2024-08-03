@@ -1,4 +1,3 @@
-
 export class Person {
 
     constructor(name: string, isConnected: boolean) {
