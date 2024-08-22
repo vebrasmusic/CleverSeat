@@ -22,7 +22,7 @@ export default function NewPlan(){
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
-    const [selectedPeople, setSelectedPeople] = useState<number[]>([]);
+    const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
 
     function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         const name = event.currentTarget.value;
@@ -52,7 +52,7 @@ export default function NewPlan(){
     const addPerson = (name: string) => {
         const person = new Person(name, false);
         const newMap = new Map(people);
-        newMap.set(newMap.size + 1, person);
+        newMap.set(newMap.size, person);
         setPeople(newMap);
         toast.success('Added ' + name + ' to the seating plan.');
     }
@@ -62,7 +62,30 @@ export default function NewPlan(){
     }
 
     const onRemovePerson = () => {
-        
+        if (selectedPeople.size === 0){
+            toast.error("No people selected.")
+            return
+        }
+        const deleteSize = selectedPeople.size;
+
+        const updatedPeople = new Map(people)
+        for (const index of selectedPeople){
+            updatedPeople.delete(index);
+        }
+        setPeople(updatedPeople);
+        setSelectedPeople(new Set)
+        toast.success("Deleted " + deleteSize + " people from list.")
+    }
+
+    const selectListItem = (index: number) => {
+        const newSet = new Set(selectedPeople);
+        if (newSet.has(index)){
+            newSet.delete(index);
+        }
+        else {
+            newSet.add(index);
+        }
+        setSelectedPeople(newSet)
     }
 
 
@@ -90,7 +113,7 @@ export default function NewPlan(){
                 <div className="flex flex-col gap-3 p-3 border-b-[0.5px] w-full">
                     <div className="text-white text-[16px]">Edit</div>
                     <div className="flex flex-row gap-6">
-                        <MenuButton tooltipText="Remove person" onClick={() => {onRemovePerson()}}>
+                        <MenuButton tooltipText="Delete people" onClick={() => {onRemovePerson()}}>
                             <UserRoundX color="#ffffff" />
                         </MenuButton>
                         <MenuButton tooltipText="Undo">
@@ -98,12 +121,12 @@ export default function NewPlan(){
                         </MenuButton>
                     </div>
                 </div>
-                <div className="flex flex-col gap-3 p-3 border-b-[0.5px] w-full">
+                <div className="flex flex-col gap-3 p-3 pb-0 border-b-[0.5px] w-full">
                     <div className="text-white text-[16px]">List of people</div>
                     <div className="flex flex-col gap-2 overflow-y-auto h-96"> 
                         {/* this one is the one w the list items */}
-                        {Array.from(people.values()).map((person, index) => {
-                            return <ListItem selectListItem={() => setSelectedPeople(prevState => [...prevState, index])} key={index} person={person}/>;
+                        {Array.from(people.entries()).map(([index, person]) => {
+                            return <ListItem selectListItem={() => {selectListItem(index)}} key={index} person={person}/>;
                         })}
                     </div>
                 </div>
