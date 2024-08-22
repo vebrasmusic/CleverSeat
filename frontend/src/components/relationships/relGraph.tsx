@@ -136,11 +136,11 @@ export default function RelGraph() {
             }}>
                     Clean up
                 </Button>
-                <Button onClick={() => {
+                {/* <Button onClick={() => {
                     autoConnectFamilyMembers();
                 }}>
                     Auto-connect family members
-                </Button>
+                </Button> */}
         </div>
 
         <CytoscapeComponent 
@@ -166,7 +166,7 @@ export default function RelGraph() {
             style: {
                 width: 4,
                 "line-color": "mapData(weight, 0.25, 1, red, white)",
-                'line-opacity': 0.8,
+                'line-opacity': 0.9,
                 'line-style': 'dashed',
                 'curve-style': 'haystack'
             }
@@ -174,7 +174,7 @@ export default function RelGraph() {
             {
                 selector: '.eh-preview, .eh-ghost-edge',
                 style: {
-                    "line-opacity": 0.1,
+                    "line-opacity": 0.3,
                 }
             },
             {

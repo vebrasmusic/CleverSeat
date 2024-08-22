@@ -143,47 +143,47 @@ export default function Plan() {
                     //             {people.map((person, index) => (
                     //                 <TableRow key={person.name}>
                     //                     <TableCell className="font-medium pr-40">
-                    //                         <Dialog>
-                    //                             <DialogTrigger>{person.name}</DialogTrigger>
-                    //                             <DialogContent>
-                    //                                 <DialogHeader>
-                    //                                     <DialogTitle>
-                    //                                         <Input 
-                    //                                         className='w-[200px]' 
-                    //                                         defaultValue={person.name}
-                    //                                         type='text'
-                    //                                         onChange = {(event) => {
-                    //                                             setCurrentName(event.target.value);
-                    //                                             setEditedIndex(index);
-                    //                                         }}
-                    //                                         />
-                    //                                     </DialogTitle>
-                    //                                     <DialogDescription>
-                    //                                         Edit person details and relationships.
-                    //                                     </DialogDescription>
-                    //                                 </DialogHeader>
-                    //                                 <div className="plan-dialog-content">
-                    //                                     <div>
-                    //                                         something here
-                    //                                     </div>
-                    //                                     <ScrollArea>
-                    //                                         <div className="flex flex-row gap-4">
-                    //                                             <TypeDropdown/>
-                    //                                             <RelationshipDropdown/>
-                    //                                         </div>
-                    //                                     </ScrollArea>
-                    //                                 </div>
-                    //                                 <DialogFooter>
-                    //                                     <Button onClick = {() => {
-                    //                                         removePerson(index);
-                    //                                         toast.success('Deleted person.');
-                    //                                     }}>Delete</Button>
-                    //                                     <DialogClose>
-                    //                                         <Button onClick={handleDialogSave}>Save</Button>
-                    //                                     </DialogClose>
-                    //                                 </DialogFooter>
-                    //                             </DialogContent>
-                    //                         </Dialog>
+                                            // <Dialog>
+                                            //     <DialogTrigger>{person.name}</DialogTrigger>
+                                            //     <DialogContent>
+                                            //         <DialogHeader>
+                                            //             <DialogTitle>
+                                            //                 <Input 
+                                            //                 className='w-[200px]' 
+                                            //                 defaultValue={person.name}
+                                            //                 type='text'
+                                            //                 onChange = {(event) => {
+                                            //                     setCurrentName(event.target.value);
+                                            //                     setEditedIndex(index);
+                                            //                 }}
+                                            //                 />
+                                            //             </DialogTitle>
+                                            //             <DialogDescription>
+                                            //                 Edit person details and relationships.
+                                            //             </DialogDescription>
+                                            //         </DialogHeader>
+                                            //         <div className="plan-dialog-content">
+                                            //             <div>
+                                            //                 something here
+                                            //             </div>
+                                            //             <ScrollArea>
+                                            //                 <div className="flex flex-row gap-4">
+                                            //                     <TypeDropdown/>
+                                            //                     <RelationshipDropdown/>
+                                            //                 </div>
+                                            //             </ScrollArea>
+                                            //         </div>
+                                            //         <DialogFooter>
+                                            //             <Button onClick = {() => {
+                                            //                 removePerson(index);
+                                            //                 toast.success('Deleted person.');
+                                            //             }}>Delete</Button>
+                                            //             <DialogClose>
+                                            //                 <Button onClick={handleDialogSave}>Save</Button>
+                                            //             </DialogClose>
+                                            //         </DialogFooter>
+                                            //     </DialogContent>
+                                            // </Dialog>
                     //                     </TableCell>
                     //                     <TableCell>{person.isConnected ? 'Connected' : 'Not Connected'}</TableCell>
                     //                 </TableRow>

@@ -9,6 +9,25 @@ export class Person {
     isConnected: boolean;
 }
 
+// export class Family
+
+export class AGraph {
+    nodes: Person[];
+
+    constructor(){
+        this.nodes = [];
+    }
+
+    addPerson(){
+        const person = new Person("random", false)
+        this.nodes.push(person)
+    }
+
+    removePerson(){
+        this.nodes.pop;
+    }
+}
+
 export class Relationship {
     node1: Person;
     node2: Person;
