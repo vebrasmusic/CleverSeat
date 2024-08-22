@@ -18,9 +18,9 @@ import { Button } from '@/components/ui/button';
 Cytoscape.use( edgehandles );
 Cytoscape.use(Cola);
 
-export default function RelGraph() {
+export default function RelGraph({people}: {people: Map<number, Person>}) {
 
-    const people = useContext(PeopleContext); // nodes
+    // const people = useContext(PeopleContext); // nodes
     const relationshipGraph = useContext(RelationshipsContext); // edges
 
     const relationships = relationshipGraph.relationships;
@@ -38,24 +38,24 @@ export default function RelGraph() {
         return 0.25
     }
 
-    const autoConnectFamilyMembers = () => {
-        for (const person of people) {
-            for (const otherPerson of people) {
-                if (person.name !== otherPerson.name && person.name.split(' ').slice(-1)[0] === otherPerson.name.split(' ').slice(-1)[0] ) {
-                    const existingRelationship = relationships.find(r => 
-                        (r.node1 === person && r.node2 === otherPerson) || 
-                        (r.node1 === otherPerson && r.node2 === person)
-                    );
-                    if (!existingRelationship) {
-                        relationshipGraph.addRelationship(person, otherPerson, 'family');
-                    }
-                }
-            }
-        }
-        toast.success('Family connected, please press tab to refresh');
-    }
+    // const autoConnectFamilyMembers = () => {
+    //     for (const person of people) {
+    //         for (const otherPerson of people) {
+    //             if (person.name !== otherPerson.name && person.name.split(' ').slice(-1)[0] === otherPerson.name.split(' ').slice(-1)[0] ) {
+    //                 const existingRelationship = relationships.find(r => 
+    //                     (r.node1 === person && r.node2 === otherPerson) || 
+    //                     (r.node1 === otherPerson && r.node2 === person)
+    //                 );
+    //                 if (!existingRelationship) {
+    //                     relationshipGraph.addRelationship(person, otherPerson, 'family');
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     toast.success('Family connected, please press tab to refresh');
+    // }
 
-    for (const person of people) { // making nodes from the created people
+    for (const [id, person] of people.entries()) { // making nodes from the created people
         const position = { x: Math.random() * 50, y: Math.random() * 50 };
         elements.push({ data: { id: person.name, label: person.name }, position: position });
     }

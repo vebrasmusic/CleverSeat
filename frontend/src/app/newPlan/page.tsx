@@ -19,9 +19,10 @@ export default function NewPlan(){
     //modal
     
 
-    const [people, setPeople] = useState<Person[]>([]);
+    const [people, setPeople] = useState<Map<number, Person>>(new Map());
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
+    const [selectedPeople, setSelectedPeople] = useState<number[]>([]);
 
     function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         const name = event.currentTarget.value;
@@ -50,7 +51,9 @@ export default function NewPlan(){
 
     const addPerson = (name: string) => {
         const person = new Person(name, false);
-        setPeople(prevPeople => [...prevPeople, person]);
+        const newMap = new Map(people);
+        newMap.set(newMap.size + 1, person);
+        setPeople(newMap);
         toast.success('Added ' + name + ' to the seating plan.');
     }
 
@@ -66,7 +69,6 @@ export default function NewPlan(){
 
     return (
         <div id="main" className="flex flex-row items-stretch align-middle bg-[#212922] h-full w-full overflow-hidden"> 
-        <PeopleContext.Provider value={people}>
             <div id="menu" className="flex flex-col items-center align-middle p-6 border-r-[0.5px] w-[300px] gap-7">
                 <div className="text-white text-[25px]">
                     Graph Tools
@@ -100,8 +102,8 @@ export default function NewPlan(){
                     <div className="text-white text-[16px]">List of people</div>
                     <div className="flex flex-col gap-2 overflow-y-auto h-96"> 
                         {/* this one is the one w the list items */}
-                        {people.map((person, key) => {
-                            return <ListItem key={key} person={person}/>;
+                        {Array.from(people.values()).map((person, index) => {
+                            return <ListItem selectListItem={() => setSelectedPeople(prevState => [...prevState, index])} key={index} person={person}/>;
                         })}
                     </div>
                 </div>
@@ -119,10 +121,9 @@ export default function NewPlan(){
                     </div>
                 </div>
                 ) : (
-                    <RelGraph/>
+                    <RelGraph people={people}/>
                 )}
             </div>
-        </PeopleContext.Provider>
         </div>
     )
 }
