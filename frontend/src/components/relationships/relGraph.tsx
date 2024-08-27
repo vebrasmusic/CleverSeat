@@ -10,7 +10,6 @@ import Cytoscape from 'cytoscape';
 // @ts-ignore
 import Cola from 'cytoscape-cola';
 import edgehandles from 'cytoscape-edgehandles';
-import { Button } from '@/components/ui/button';
 
 Cytoscape.use( edgehandles );
 Cytoscape.use(Cola);

@@ -10,10 +10,10 @@ import { MenuButton } from "@/components/ui/menuButton";
 import { ListItem } from "@/components/relationships/listItem";
 
 
-
 export default function NewPlan(){
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
-    const [relationships, setRelationships] = useState<Person[][]>([]);
+    const [relationships, setRelationships] = useState<Person[][]>([]); // TODO FIX 
+    // [[person1, person2],[perosn1],[person3]]
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
@@ -64,11 +64,9 @@ export default function NewPlan(){
 
         const newRelationships = relationships.map(rel => rel ? [...rel] : []);
         
-
         const updatedPeople = new Map(people)
         for (const index of selectedPeople){
             updatedPeople.delete(index);
-            
         }
         setPeople(updatedPeople);
         setRelationships(newRelationships)
@@ -85,6 +83,25 @@ export default function NewPlan(){
             newSet.add(index);
         }
         setSelectedPeople(newSet)
+    }
+
+    const onAddEdgeButtonClick = () => {
+        if (selectedPeople.size < 2){
+            toast.error("Please select 2 or more people to connect.")
+            return;
+        }
+        const numConnected = selectedPeople.size;
+        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
+        selectedPeople.forEach((index) => {
+            const addedPerson = people.get(index);
+            for (let i = 0; i < newRelationships.length; i++){
+                if (i !== index && addedPerson && selectedPeople.has(i)){
+                    newRelationships[i].push(addedPerson);
+                }
+            }
+        })
+        setRelationships(newRelationships)
+        toast.success(`Connected ${numConnected} people.`)
     }
 
     useEffect(() => {
@@ -108,7 +125,7 @@ export default function NewPlan(){
                         <MenuButton tooltipText="Add new family">
                             <Users color="#ffffff" />
                         </MenuButton>
-                        <MenuButton tooltipText="Add new edge">
+                        <MenuButton tooltipText="Add new edge" onClick={onAddEdgeButtonClick}>
                             <Workflow color="#ffffff" />
                         </MenuButton>
                     </div>
