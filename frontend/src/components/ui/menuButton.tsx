@@ -13,7 +13,7 @@ import {
 export function MenuButton({children, tooltipText, onClick}: {children: React.ReactNode, tooltipText: string, onClick?: () => void}) {
 
   return (
-    <TooltipProvider delayDuration={100}>
+    <TooltipProvider delayDuration={200}>
       <Tooltip>
         <TooltipTrigger className="w-full bg-transparent">
           <Button className="w-full bg-transparent p-[6px]" variant="outline" onClick={onClick} asChild>

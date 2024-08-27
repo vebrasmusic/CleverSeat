@@ -1,30 +1,24 @@
 'use client'
 
-import { useState} from "react";
+import { useEffect, useState} from "react";
 
-import { ListItem } from "@/components/relationships/listItem";
 import RelGraph from "@/components/relationships/relGraph";
-import { AGraph, Person, Relationship, RelationshipGraph } from "@/classes/people";
-import {PeopleContext} from "@/context/peopleContext"
+import {Person} from "@/classes/people";
 import {toast} from "sonner"
 import { UserRoundPlus, UserRoundX, Users, Workflow, Undo2 } from "lucide-react";
 import { MenuButton } from "@/components/ui/menuButton";
+import { ListItem } from "@/components/relationships/listItem";
 
 
 
 export default function NewPlan(){
-    // left side => menu
-    // right side => graph
-
-    //modal
-    
-
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
+    const [relationships, setRelationships] = useState<Person[][]>([]);
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
 
-    function handleKeyPress(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
+    function handleInputEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         const name = event.currentTarget.value;
 
         setCurrentName(name); // Update state
@@ -45,15 +39,15 @@ export default function NewPlan(){
         }
     }
 
-    const onAddFamily = () => {
-        // add parent node to graph
-    }
-
     const addPerson = (name: string) => {
         const person = new Person(name, false);
         const newMap = new Map(people);
         newMap.set(newMap.size, person);
         setPeople(newMap);
+
+        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
+        newRelationships.push([]);
+        setRelationships(newRelationships)
         toast.success('Added ' + name + ' to the seating plan.');
     }
 
@@ -68,13 +62,18 @@ export default function NewPlan(){
         }
         const deleteSize = selectedPeople.size;
 
+        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
+        
+
         const updatedPeople = new Map(people)
         for (const index of selectedPeople){
             updatedPeople.delete(index);
+            
         }
         setPeople(updatedPeople);
+        setRelationships(newRelationships)
         setSelectedPeople(new Set)
-        toast.success("Deleted " + deleteSize + " people from list.")
+        toast.success("Deleted " + deleteSize + (deleteSize > 1 ? " people " : " person ") + " from list.")
     }
 
     const selectListItem = (index: number) => {
@@ -87,6 +86,10 @@ export default function NewPlan(){
         }
         setSelectedPeople(newSet)
     }
+
+    useEffect(() => {
+        console.log('Relationships state has changed:', relationships);
+    }, [relationships])
 
 
 
@@ -121,6 +124,7 @@ export default function NewPlan(){
                         </MenuButton>
                     </div>
                 </div>
+                {/* <NameList/> */}
                 <div className="flex flex-col gap-3 p-3 pb-0 border-b-[0.5px] w-full">
                     <div className="text-white text-[16px]">List of people</div>
                     <div className="flex flex-col gap-2 overflow-y-auto h-96"> 
@@ -131,20 +135,21 @@ export default function NewPlan(){
                     </div>
                 </div>
                 <div className="text-white items-center align-center">
-                    Created by <a href="https://andresduvvuri.com">Andrés Duvvuri</a>
+                    {/* Created by <a href="https://andresduvvuri.com" className="font-bold">Andrés Duvvuri</a> */}
+                    
                 </div>
             </div>
-            <div className="w-full h-full">
+            <div className="w-full h-full flex flex-row justify-center items-center">
                 {isEditing ? (
                     <div className="plan-content-div">
-                    <input autoFocus className="text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleKeyPress} />
-                    <div className="plan-header-item">
-                        <p className="text-[#D7263D]">Press ⏎ to save this name.</p>
-                        <p className="text-[#D7263D]">Press Esc to cancel.</p>
+                        <input autoFocus className="text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleInputEnter}/>
+                        <div className="plan-header-item">
+                            <p className="text-[#D7263D]">Press ⏎ to save this name.</p>
+                            <p className="text-[#D7263D]">Press Esc to cancel.</p>
+                        </div>
                     </div>
-                </div>
                 ) : (
-                    <RelGraph people={people}/>
+                    <RelGraph people={people} relationships={relationships} setRelationships={setRelationships}/>
                 )}
             </div>
         </div>
