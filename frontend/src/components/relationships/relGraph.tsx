@@ -35,8 +35,10 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
 
         // nodes
         for (const [index, person] of people) {
+            const nameParts = person.name.split(" ");
+            const initials = nameParts.map(part => part.charAt(0).toUpperCase() + ".").join(" ");
             const position = { x: Math.random() * 50, y: Math.random() * 50 };
-            newElements.push({ data: { id: index.toString(), label: person.name }, position: position });
+            newElements.push({ data: { id: index.toString(), label: initials }, position: position });
         }
 
         // edges
