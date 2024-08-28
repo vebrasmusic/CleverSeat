@@ -131,17 +131,18 @@ export default function NewPlan(){
                 
                 const newPeopleMap = new Map(people);
                 const newRelationshipsMap = new Map(relationships);
+                let currentIndex = indexCounter;
 
                 names.forEach((fullName) => {
                     const person = new Person(fullName, false);
-                    const ind = indexCounter;
-                    setIndexCounter(indexCounter + 1);
-                    newPeopleMap.set(ind, person);
-                    newRelationshipsMap.set(ind, new Set());
+                    newPeopleMap.set(currentIndex, person);
+                    newRelationshipsMap.set(currentIndex, new Set());
+                    currentIndex++;
                 });
 
                 setPeople(newPeopleMap);
                 setRelationships(newRelationshipsMap);
+                setIndexCounter(currentIndex);
                 toast.success(`Added ${names.length} people to the chart.`);
             };
             reader.readAsText(file);

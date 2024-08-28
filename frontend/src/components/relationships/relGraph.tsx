@@ -113,29 +113,13 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
                 'line-style': 'dashed',
                 'curve-style': 'haystack'
             }
-            },
-            {
-                selector: '.eh-preview, .eh-ghost-edge',
-                style: {
-                    "line-opacity": 0.3,
-                }
-            },
-            {
-            selector: '.eh-hover',
-            style: {
-                "border-width": 1,
-                "border-color": "gold",
-                "z-index": 1000,
-            }
             }
         ]}
         layout={{ 
             name: 'cola'
         }}
         maxZoom={5}
-        minZoom={0.5}
-        autolock
-        
+        minZoom={0.5}        
         elements={elements} className='w-full h-full bg-[#212922]' />
         </>
     )
