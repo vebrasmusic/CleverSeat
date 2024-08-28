@@ -14,7 +14,7 @@ import edgehandles from 'cytoscape-edgehandles';
 Cytoscape.use( edgehandles );
 Cytoscape.use(Cola);
 
-export default function RelGraph({people, relationships, setRelationships}: {people: Map<number, Person>, relationships: Person[][], setRelationships: (relationships: Person[][]) => void}) {
+export default function RelGraph({people, relationships}: {people: Map<number, Person>, relationships: Map<number, Set<number>>}) {
 
     const [elements, setElements] = useState([]);
     const cy = useRef(null);
@@ -33,21 +33,33 @@ export default function RelGraph({people, relationships, setRelationships}: {peo
     useEffect(() => {
         const newElements = [];
 
-        for (const [index, person] of people.entries()) {
+        // nodes
+        for (const [index, person] of people) {
             const position = { x: Math.random() * 50, y: Math.random() * 50 };
             newElements.push({ data: { id: index.toString(), label: person.name }, position: position });
         }
 
-        // for (let i = 0; i < relationships.length; i++) {
-        //     const source = people.get(i);
-        //     if (source && relationships[i].length !== 0) {
-        //         for (const target of relationships[i]) {
-        //             if (target && target.name) {
-        //                 newElements.push({ data: { source: source.name, target: target.name } });
-        //             }
-        //         }
-        //     }
-        // }
+        // edges
+        const usedCombos = new Set<number>;
+        for (const [index, relationshipSet] of relationships) {
+            const sourceInd = index.toString();
+            if (relationshipSet.size !== 0){
+                for (const targ of relationshipSet){
+                    const targetInd = targ.toString();
+                    const newString = `${sourceInd}000000${targetInd}`;
+                    const revNewString = `${targetInd}000000${sourceInd}`;
+
+                    if (!usedCombos.has(Number(newString)) && !usedCombos.has(Number(revNewString))){
+                        newElements.push({ data: { source: sourceInd, target: targetInd}});
+                        usedCombos.add(Number(newString));
+                        usedCombos.add(Number(revNewString));
+                    }
+                    else {
+                        console.log("duplicate edge detected")
+                    }
+                }
+            }
+        }
         //@ts-ignore
         setElements(newElements);
     }, [people, relationships]);
@@ -72,26 +84,6 @@ export default function RelGraph({people, relationships, setRelationships}: {peo
 
     return (
     <>
-        {/* <div className='flex justify-center items-center flex-row'>
-            <Button onClick={() => { //refresh layout button
-                if (cy.current) {
-                    //@ts-ignore
-                    cy.current.layout({
-                        name: 'cola',
-                        animate: true,
-                        padding: 50,
-                        randomize: true,
-                        avoidOverlap: true,
-                        centerGraph: true,
-                        //@ts-ignore
-                        fit: true // Fits to screen after layout
-                    }).run();
-                }
-            }}>
-                    Clean up
-                </Button>
-        </div> */}
-
         <CytoscapeComponent 
         // @ts-ignore
         cy={(instance) => { cy.current = instance; }} // Assigning the Cytoscape instance to the ref

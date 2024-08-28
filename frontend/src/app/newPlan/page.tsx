@@ -12,7 +12,7 @@ import { ListItem } from "@/components/relationships/listItem";
 
 export default function NewPlan(){
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
-    const [relationships, setRelationships] = useState<Map<number, Set<number>>>(new Map()); // TODO FIX 
+    const [relationships, setRelationships] = useState<Map<number, Set<number>>>(new Map()); 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
@@ -115,8 +115,6 @@ export default function NewPlan(){
         console.log('Relationships state has changed:', relationships);
     }, [relationships])
 
-
-
     return (
         <div id="main" className="flex flex-row items-stretch align-middle bg-[#212922] h-full w-full overflow-hidden"> 
             <div id="menu" className="flex flex-col items-center align-middle p-6 border-r-[0.5px] w-[300px] gap-7">
@@ -159,8 +157,7 @@ export default function NewPlan(){
                     </div>
                 </div>
                 <div className="text-white items-center align-center">
-                    {/* Created by <a href="https://andresduvvuri.com" className="font-bold">Andrés Duvvuri</a> */}
-                    
+                    Created by <a href="https://andresduvvuri.com" className="font-bold">Andrés Duvvuri</a>
                 </div>
             </div>
             <div className="w-full h-full flex flex-row justify-center items-center">
@@ -173,8 +170,7 @@ export default function NewPlan(){
                         </div>
                     </div>
                 ) : (
-                    // <RelGraph people={people} relationships={relationships} setRelationships={setRelationships}/>
-                    <></>
+                    <RelGraph people={people} relationships={relationships}/>
                 )}
             </div>
         </div>
