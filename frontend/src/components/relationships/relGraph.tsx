@@ -73,7 +73,7 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
                 cy.current.layout({
                     name: 'cola',
                     animate: true,
-                    padding: 50,
+                    padding: 10,
                     randomize: true,
                     avoidOverlap: true,
                     centerGraph: true,
@@ -132,6 +132,10 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
         layout={{ 
             name: 'cola'
         }}
+        maxZoom={5}
+        minZoom={0.5}
+        autolock
+        
         elements={elements} className='w-full h-full bg-[#212922]' />
         </>
     )

@@ -12,6 +12,7 @@ import { ListItem } from "@/components/relationships/listItem";
 
 export default function NewPlan(){
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
+    const [indexCounter, setIndexCounter] = useState(0);
     const [relationships, setRelationships] = useState<Map<number, Set<number>>>(new Map()); 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
@@ -41,7 +42,8 @@ export default function NewPlan(){
     const addPerson = (name: string) => {
         const person = new Person(name, false);
         const newPeopleMap = new Map(people);
-        const ind = newPeopleMap.size;
+        const ind = indexCounter;
+        setIndexCounter(indexCounter + 1);
         newPeopleMap.set(ind, person);
         setPeople(newPeopleMap);
 
@@ -132,7 +134,8 @@ export default function NewPlan(){
 
                 names.forEach((fullName) => {
                     const person = new Person(fullName, false);
-                    const ind = newPeopleMap.size;
+                    const ind = indexCounter;
+                    setIndexCounter(indexCounter + 1);
                     newPeopleMap.set(ind, person);
                     newRelationshipsMap.set(ind, new Set());
                 });
@@ -185,7 +188,7 @@ export default function NewPlan(){
                 {/* <NameList/> */}
                 <div className="flex flex-col gap-3 p-3 pb-0 border-b-[0.5px] w-full">
                     <div className="text-white text-[16px]">List of people</div>
-                    <div className="flex flex-col gap-2 overflow-y-auto h-96"> 
+                    <div className="flex flex-col gap-2 pb-2 overflow-y-auto h-96"> 
                         {/* this one is the one w the list items */}
                         {Array.from(people.entries()).map(([index, person]) => {
                             return <ListItem selectListItem={() => {selectListItem(index)}} key={index} person={person}/>;
