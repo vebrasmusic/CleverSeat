@@ -12,8 +12,7 @@ import { ListItem } from "@/components/relationships/listItem";
 
 export default function NewPlan(){
     const [people, setPeople] = useState<Map<number, Person>>(new Map());
-    const [relationships, setRelationships] = useState<Person[][]>([]); // TODO FIX 
-    // [[person1, person2],[perosn1],[person3]]
+    const [relationships, setRelationships] = useState<Map<number, Set<number>>>(new Map()); // TODO FIX 
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
@@ -41,13 +40,14 @@ export default function NewPlan(){
 
     const addPerson = (name: string) => {
         const person = new Person(name, false);
-        const newMap = new Map(people);
-        newMap.set(newMap.size, person);
-        setPeople(newMap);
+        const newPeopleMap = new Map(people);
+        const ind = newPeopleMap.size;
+        newPeopleMap.set(ind, person);
+        setPeople(newPeopleMap);
 
-        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
-        newRelationships.push([]);
-        setRelationships(newRelationships)
+        const newRelationshipsMap = new Map(relationships);
+        newRelationshipsMap.set(ind, new Set())
+        setRelationships(newRelationshipsMap)
         toast.success('Added ' + name + ' to the seating plan.');
     }
 
@@ -62,15 +62,22 @@ export default function NewPlan(){
         }
         const deleteSize = selectedPeople.size;
 
-        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
-        
-        const updatedPeople = new Map(people)
+        const updatedRelationshipsMap = new Map(relationships);
+        const updatedPeopleMap = new Map(people);
+
         for (const index of selectedPeople){
-            updatedPeople.delete(index);
+            updatedPeopleMap.delete(index);
+            updatedRelationshipsMap.delete(index);
+            for (const [internalInd, relationshipSet] of updatedRelationshipsMap){
+                if (relationshipSet.has(index)){
+                    relationshipSet.delete(index);
+                }
+            }
         }
-        setPeople(updatedPeople);
-        setRelationships(newRelationships)
-        setSelectedPeople(new Set)
+
+        setPeople(updatedPeopleMap);
+        setRelationships(updatedRelationshipsMap);
+        setSelectedPeople(new Set);
         toast.success("Deleted " + deleteSize + (deleteSize > 1 ? " people " : " person ") + " from list.")
     }
 
@@ -91,16 +98,16 @@ export default function NewPlan(){
             return;
         }
         const numConnected = selectedPeople.size;
-        const newRelationships = relationships.map(rel => rel ? [...rel] : []);
-        selectedPeople.forEach((index) => {
-            const addedPerson = people.get(index);
-            for (let i = 0; i < newRelationships.length; i++){
-                if (i !== index && addedPerson && selectedPeople.has(i)){
-                    newRelationships[i].push(addedPerson);
+        const newRelationshipsMap = new Map(relationships);
+
+        selectedPeople.forEach((selectedIndex) => {
+            for (const [intInd, relationshipsSet] of newRelationshipsMap){
+                if (intInd !== selectedIndex && selectedPeople.has(intInd)){
+                    relationshipsSet.add(selectedIndex);
                 }
             }
         })
-        setRelationships(newRelationships)
+        setRelationships(newRelationshipsMap)
         toast.success(`Connected ${numConnected} people.`)
     }
 
@@ -166,7 +173,8 @@ export default function NewPlan(){
                         </div>
                     </div>
                 ) : (
-                    <RelGraph people={people} relationships={relationships} setRelationships={setRelationships}/>
+                    // <RelGraph people={people} relationships={relationships} setRelationships={setRelationships}/>
+                    <></>
                 )}
             </div>
         </div>
