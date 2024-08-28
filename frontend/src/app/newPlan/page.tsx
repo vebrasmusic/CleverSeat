@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useState} from "react";
+import { useEffect, useState, useRef} from "react";
 
 import RelGraph from "@/components/relationships/relGraph";
 import {Person} from "@/classes/people";
 import {toast} from "sonner"
-import { UserRoundPlus, UserRoundX, Users, Workflow, Undo2 } from "lucide-react";
+import { UserRoundPlus, UserRoundX, Users, Workflow, Undo2, Upload } from "lucide-react";
 import { MenuButton } from "@/components/ui/menuButton";
 import { ListItem } from "@/components/relationships/listItem";
 
@@ -111,6 +111,42 @@ export default function NewPlan(){
         toast.success(`Connected ${numConnected} people.`)
     }
 
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const onUploadCSV = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.type === 'text/csv') {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target?.result as string;
+                const names = text.split('\n').map(name => name.trim()).filter(name => name);
+                
+                const newPeopleMap = new Map(people);
+                const newRelationshipsMap = new Map(relationships);
+
+                names.forEach((fullName) => {
+                    const person = new Person(fullName, false);
+                    const ind = newPeopleMap.size;
+                    newPeopleMap.set(ind, person);
+                    newRelationshipsMap.set(ind, new Set());
+                });
+
+                setPeople(newPeopleMap);
+                setRelationships(newRelationshipsMap);
+                toast.success(`Added ${names.length} people to the chart.`);
+            };
+            reader.readAsText(file);
+        } else {
+            toast.error("Please upload a valid CSV file.");
+        }
+    }
+
     useEffect(() => {
         console.log('Relationships state has changed:', relationships);
     }, [relationships])
@@ -141,8 +177,8 @@ export default function NewPlan(){
                         <MenuButton tooltipText="Delete people" onClick={() => {onRemovePerson()}}>
                             <UserRoundX color="#ffffff" />
                         </MenuButton>
-                        <MenuButton tooltipText="Undo">
-                            <Undo2 color="#ffffff" />
+                        <MenuButton tooltipText="Upload CSV" onClick={() => {onUploadCSV()}}>
+                            <Upload color="#ffffff" />
                         </MenuButton>
                     </div>
                 </div>
@@ -173,6 +209,13 @@ export default function NewPlan(){
                     <RelGraph people={people} relationships={relationships}/>
                 )}
             </div>
+            <input
+                type="file"
+                ref={fileInputRef}
+                accept=".csv"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
         </div>
     )
 }
