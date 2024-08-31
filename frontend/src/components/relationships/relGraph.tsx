@@ -10,25 +10,20 @@ import Cytoscape from 'cytoscape';
 // @ts-ignore
 import Cola from 'cytoscape-cola';
 import edgehandles from 'cytoscape-edgehandles';
+// @ts-ignore
+import coseBilkent from 'cytoscape-cose-bilkent';
+// @ts-ignore
+import avsdf from 'cytoscape-avsdf';
+
 
 Cytoscape.use( edgehandles );
-Cytoscape.use(Cola);
+// Cytoscape.use(coseBilkent);
+Cytoscape.use(avsdf)
 
-export default function RelGraph({people, relationships}: {people: Map<number, Person>, relationships: Map<number, Set<number>>}) {
+export default function RelGraph({people, relationships}: {people: Map<number, Person>, relationships: Map<number, Map<number, number>>}) {
 
     const [elements, setElements] = useState([]);
     const cy = useRef(null);
-
-    const getWeight = (relationshipType: string) => {
-        if (relationshipType === 'friend') {
-            return 0.5;
-        } else if (relationshipType === 'family') {
-            return 1;
-        } else if (relationshipType === 'acquaintance') {
-            return 0.25;
-        }
-        return 0.25
-    }
 
     useEffect(() => {
         const newElements = [];
@@ -43,21 +38,18 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
 
         // edges
         const usedCombos = new Set<number>;
-        for (const [index, relationshipSet] of relationships) {
+        for (const [index, relationshipMap] of relationships) {
             const sourceInd = index.toString();
-            if (relationshipSet.size !== 0){
-                for (const targ of relationshipSet){
+            if (relationshipMap.size !== 0){
+                for (const [targ, weight] of relationshipMap){
                     const targetInd = targ.toString();
                     const newString = `${sourceInd}000000${targetInd}`;
                     const revNewString = `${targetInd}000000${sourceInd}`;
 
                     if (!usedCombos.has(Number(newString)) && !usedCombos.has(Number(revNewString))){
-                        newElements.push({ data: { source: sourceInd, target: targetInd}});
+                        newElements.push({ data: { source: sourceInd, target: targetInd, weight: weight}});
                         usedCombos.add(Number(newString));
                         usedCombos.add(Number(revNewString));
-                    }
-                    else {
-                        console.log("duplicate edge detected")
                     }
                 }
             }
@@ -69,20 +61,39 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
 
     useEffect(() => {
         if (cy.current) {
+            try {
+                console.log("Applying layout with elements:", elements);
                 //@ts-ignore
+                // cy.current.layout({
+                //     name: 'cose-bilkent',
+                //     nodeRepulsion: 10000,
+                //     // idealEdgeLength: 
+                //     edgeElasticity: 0.8,
+                //     nestingFactor: 0.1,
+                //     gravity: 0.25,
+                //     numIter: 2500,
+                //     tile: true,
+                //     animate: 'during',
+                //     animationDuration: 1000,
+                //     fit: true,
+                //     padding: 30,
+                //     randomize: true,
+                //     componentSpacing: 300,
+                //     nodeDimensionsIncludeLabels: true,
+                //     refresh: 10,
+                // }).run();
                 cy.current.layout({
-                    name: 'cola',
-                    animate: true,
-                    padding: 10,
-                    randomize: true,
-                    avoidOverlap: true,
-                    centerGraph: true,
-                    //@ts-ignore
-                    fit: true // Fits to screen after layout
-                }).run();
+                        name: 'avsdf',
+                        nodeSeparation: 60,
+                        refresh: 20,
+                        fit: true
+                    }).run();
+            } catch (error) {
+                console.error("Layout error:", error);
+                console.log("Elements:", elements);
             }
-
-    }, [elements])
+        }
+    }, [elements]);
 
     return (
     <>
@@ -95,28 +106,28 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
             style: {
                 "background-color": "white",
                 label: 'data(label)',
-            }
-            },
-            {
-            selector: 'label',
-            style: {
                 "color": "white",
-                "min-zoomed-font-size": 30,
+                "text-border-opacity": 100
             }
             },
             {
             selector: 'edge',
             style: {
-                width: 4,
-                "line-color": "mapData(weight, 0.25, 1, red, white)",
-                'line-opacity': 0.9,
-                'line-style': 'dashed',
+                width: 1,
+                "line-color": (ele) => {
+                    const weight = ele.data('weight');
+                    if (weight <= 0.2) return 'red';
+                    if (weight <= 0.6) return 'orange';
+                    if (weight <= 0.8) return 'yellow';
+                    return 'white';
+                },                'line-opacity': 0.9,
+                'line-style': 'solid',
                 'curve-style': 'haystack'
             }
             }
         ]}
         layout={{ 
-            name: 'cola'
+            name: 'avsdf'
         }}
         maxZoom={5}
         minZoom={0.5}        

@@ -3,20 +3,30 @@
 import { useEffect, useState, useRef} from "react";
 
 import RelGraph from "@/components/relationships/relGraph";
-import {Person} from "@/classes/people";
-import {toast} from "sonner"
-import { UserRoundPlus, UserRoundX, Users, Workflow, Undo2, Upload } from "lucide-react";
+import { Person } from "@/classes/people";
+import { toast } from "sonner"
+import { UserRoundPlus, UserRoundX, Users, Workflow, Upload } from "lucide-react";
 import { MenuButton } from "@/components/ui/menuButton";
 import { ListItem } from "@/components/relationships/listItem";
 
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
+
 
 export default function NewPlan(){
-    const [people, setPeople] = useState<Map<number, Person>>(new Map());
+    const [people, setPeople] = useState<Map<number, Person>>(new Map()); // map [index: Person]
     const [indexCounter, setIndexCounter] = useState(0);
-    const [relationships, setRelationships] = useState<Map<number, Set<number>>>(new Map()); 
-    const [isEditing, setIsEditing] = useState<boolean>(false);
+    const [relationships, setRelationships] = useState<Map<number, Map<number, number>>>(new Map()); // Map [sourceIndex: [[targetindex, weight]]]
+    const [isEditingName, setisEditingName] = useState<boolean>(false);
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
+    const [isEditingEdgeWeight, setIsEditingEdgeWeight] = useState<boolean>(false);
+    const [currentEdgeWeight, setCurrentEdgeWeight] = useState<number | null>(null);
 
     function handleInputEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         const name = event.currentTarget.value;
@@ -28,14 +38,30 @@ export default function NewPlan(){
                 addPerson(name); // this spreads the state and adds to it
                 setCurrentName('');
                 event.currentTarget.value = ''; // Clear the input field
-                setIsEditing(false);
+                setisEditingName(false);
             }
             else {
-                toast.error("Please type in a name.")
+                toast.error("Please type in a name.");
             }
         }
         else if (event.key === "Escape") {
-            setIsEditing(false)
+            setisEditingName(false)
+        }
+    }
+
+    function handleSelectEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
+        if (event.key === "Enter") {
+            if (currentEdgeWeight) {
+                addEdge(currentEdgeWeight)// this spreads the state and adds to it
+                setCurrentEdgeWeight(0.2);
+                setIsEditingEdgeWeight(false)
+            }
+            else {
+                toast.error("Please select a relationship type.");
+            }
+        }
+        else if (event.key === "Escape") {
+            setIsEditingEdgeWeight(false)
         }
     }
 
@@ -48,13 +74,13 @@ export default function NewPlan(){
         setPeople(newPeopleMap);
 
         const newRelationshipsMap = new Map(relationships);
-        newRelationshipsMap.set(ind, new Set())
+        newRelationshipsMap.set(ind, new Map())
         setRelationships(newRelationshipsMap)
         toast.success('Added ' + name + ' to the seating plan.');
     }
 
     const onAddButtonClick = () => {
-        setIsEditing(true);
+        setisEditingName(true);
     }
 
     const onRemovePerson = () => {
@@ -99,19 +125,26 @@ export default function NewPlan(){
             toast.error("Please select 2 or more people to connect.")
             return;
         }
+        setIsEditingEdgeWeight(true);
+    }
+
+    const addEdge = (edgeWeight: number) => {
         const numConnected = selectedPeople.size;
         const newRelationshipsMap = new Map(relationships);
 
         selectedPeople.forEach((selectedIndex) => {
-            for (const [intInd, relationshipsSet] of newRelationshipsMap){
+            for (const [intInd, relationshipsMap] of newRelationshipsMap){
                 if (intInd !== selectedIndex && selectedPeople.has(intInd)){
-                    relationshipsSet.add(selectedIndex);
+                    relationshipsMap.set(selectedIndex, edgeWeight);
                 }
             }
         })
-        setRelationships(newRelationshipsMap)
+        setRelationships(newRelationshipsMap);
+        setIsEditingEdgeWeight(false);
         toast.success(`Connected ${numConnected} people.`)
     }
+
+
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -136,7 +169,7 @@ export default function NewPlan(){
                 names.forEach((fullName) => {
                     const person = new Person(fullName, false);
                     newPeopleMap.set(currentIndex, person);
-                    newRelationshipsMap.set(currentIndex, new Set());
+                    newRelationshipsMap.set(currentIndex, new Map());
                     currentIndex++;
                 });
 
@@ -157,7 +190,7 @@ export default function NewPlan(){
 
     return (
         <div id="main" className="flex flex-row items-stretch align-middle bg-[#212922] h-full w-full overflow-hidden"> 
-            <div id="menu" className="flex flex-col items-center align-middle p-6 border-r-[0.5px] w-[300px] gap-7">
+            <div id="menu" className="flex flex-col items-center align-middle p-6 border-r-[0.5px] gap-7 w-[400px]">
                 <div className="text-white text-[25px]">
                     Graph Tools
                 </div>
@@ -201,17 +234,41 @@ export default function NewPlan(){
                 </div>
             </div>
             <div className="w-full h-full flex flex-row justify-center items-center">
-                {isEditing ? (
-                    <div className="plan-content-div">
-                        <input autoFocus className="text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleInputEnter}/>
-                        <div className="plan-header-item">
-                            <p className="text-[#D7263D]">Press ⏎ to save this name.</p>
-                            <p className="text-[#D7263D]">Press Esc to cancel.</p>
-                        </div>
-                    </div>
-                ) : (
-                    <RelGraph people={people} relationships={relationships}/>
-                )}
+            {(() => {
+                    if (isEditingName) {
+                        return (
+                            <div className="plan-content-div">
+                                <input autoFocus className="text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleInputEnter}/>
+                                <div className="plan-header-item">
+                                    <p className="text-[#D7263D]">Press Enter to save this name.</p>
+                                    <p className="text-[#D7263D]">Press Esc to cancel.</p>
+                                </div>
+                            </div>
+                        );
+                    } else if (isEditingEdgeWeight) {
+                        return (
+                            <form className="plan-content-div">
+                                <Select onValueChange={(value) => {setCurrentEdgeWeight(Number(value))}}>
+                                    <SelectTrigger autoFocus className=" text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none " onKeyDown={handleSelectEnter}>
+                                        <SelectValue placeholder="Relationship Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="1">Immediate Family</SelectItem>
+                                        <SelectItem value="0.8">Family / Related</SelectItem>
+                                        <SelectItem value="0.6">Friend</SelectItem>
+                                        <SelectItem value="0.2">Acquaintance</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <div className="plan-header-item">
+                                    <p className="text-[#D7263D]">Press Enter to save this relationship.</p>
+                                    <p className="text-[#D7263D]">Press Esc to cancel.</p>
+                                </div>
+                            </form>
+                        );
+                    } else {
+                        return <RelGraph people={people} relationships={relationships}/>;
+                    }
+                })()}
             </div>
             <input
                 type="file"
