@@ -5,7 +5,7 @@ import { useEffect, useState, useRef} from "react";
 import RelGraph from "@/components/relationships/relGraph";
 import { Person } from "@/classes/people";
 import { toast } from "sonner"
-import { UserRoundPlus, UserRoundX, Users, Workflow, Upload } from "lucide-react";
+import { UserRoundPlus, UserRoundX, Users, Workflow, Upload, UserRoundSearch } from "lucide-react";
 import { MenuButton } from "@/components/ui/menuButton";
 import { ListItem } from "@/components/relationships/listItem";
 
@@ -16,6 +16,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { Input } from "@/components/ui/input";
 
 
 export default function NewPlan(){
@@ -27,6 +28,17 @@ export default function NewPlan(){
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
     const [isEditingEdgeWeight, setIsEditingEdgeWeight] = useState<boolean>(false);
     const [currentEdgeWeight, setCurrentEdgeWeight] = useState<number | null>(null);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const weights = [1,0.8,0.7,0.3];
+
+    const handleOnSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const term = event.target.value.toLowerCase();
+        setSearchTerm(term);
+    };
+
+    const filteredPeople = Array.from(people.entries()).filter(([index, person]) => {
+        return searchTerm === "" || person.name.toLowerCase().includes(searchTerm);
+    });
 
     function handleInputEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         const name = event.currentTarget.value;
@@ -144,8 +156,6 @@ export default function NewPlan(){
         toast.success(`Connected ${numConnected} people.`)
     }
 
-
-
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const onUploadCSV = () => {
@@ -221,10 +231,13 @@ export default function NewPlan(){
                 </div>
                 {/* <NameList/> */}
                 <div className="flex flex-col gap-3 p-3 pb-0 border-b-[0.5px] w-full">
-                    <div className="text-white text-[16px]">List of people</div>
+                    <div className="flex flex-row gap-1 align-middle items-center">
+                        <UserRoundSearch color="white"/>
+                        <Input className="text-white border-0" placeholder="Search for a name..." onChange={handleOnSearchChange} type="search"></Input>
+                    </div>
                     <div className="flex flex-col gap-2 pb-2 overflow-y-auto h-96"> 
                         {/* this one is the one w the list items */}
-                        {Array.from(people.entries()).map(([index, person]) => {
+                        {filteredPeople.map(([index, person]) => {
                             return <ListItem selectListItem={() => {selectListItem(index)}} key={index} person={person}/>;
                         })}
                     </div>
@@ -253,10 +266,10 @@ export default function NewPlan(){
                                         <SelectValue placeholder="Relationship Type" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="1">Immediate Family</SelectItem>
-                                        <SelectItem value="0.8">Family / Related</SelectItem>
-                                        <SelectItem value="0.6">Friend</SelectItem>
-                                        <SelectItem value="0.2">Acquaintance</SelectItem>
+                                        <SelectItem value={weights[0].toString()}>Immediate Family</SelectItem>
+                                        <SelectItem value={weights[1].toString()}>Family / Related</SelectItem>
+                                        <SelectItem value={weights[2].toString()}>Friend</SelectItem>
+                                        <SelectItem value={weights[3].toString()}>Acquaintance</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <div className="plan-header-item">
@@ -266,7 +279,7 @@ export default function NewPlan(){
                             </form>
                         );
                     } else {
-                        return <RelGraph people={people} relationships={relationships}/>;
+                        return <RelGraph people={people} relationships={relationships} weights={weights}/>;
                     }
                 })()}
             </div>

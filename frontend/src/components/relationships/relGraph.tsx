@@ -18,9 +18,9 @@ import avsdf from 'cytoscape-avsdf';
 
 Cytoscape.use( edgehandles );
 // Cytoscape.use(coseBilkent);
-Cytoscape.use(avsdf)
+Cytoscape.use(Cola)
 
-export default function RelGraph({people, relationships}: {people: Map<number, Person>, relationships: Map<number, Map<number, number>>}) {
+export default function RelGraph({people, relationships, weights}: {people: Map<number, Person>, relationships: Map<number, Map<number, number>>, weights: number[]}) {
 
     const [elements, setElements] = useState([]);
     const cy = useRef(null);
@@ -83,11 +83,32 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
                 //     refresh: 10,
                 // }).run();
                 cy.current.layout({
-                        name: 'avsdf',
-                        nodeSeparation: 60,
-                        refresh: 20,
-                        fit: true
-                    }).run();
+                    name: 'cola',
+                    animate: true, // whether to show the layout as it's running
+                    refresh: 1, // number of ticks per frame; higher is faster but more jerky
+                    maxSimulationTime: 4000, // max length in ms to run the layout
+                    ungrabifyWhileSimulating: false, // so you can't drag nodes during layout
+                    fit: true, // on every layout reposition of nodes, fit the viewport
+                    padding: 0, // padding around the simulation
+
+                    // positioning options
+                    randomize: true, // use random node positions at beginning of layout
+                    avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+                    handleDisconnected: true, // if true, avoids disconnected components from overlapping
+
+                    
+
+                    // different methods of specifying edge length
+                    // each can be a constant numerical value or a function like `function( edge ){ return 2; }`
+                    edgeLength: function(edge) {
+                        const scaleFactor = 1
+                        const weight = parseFloat(edge.data('weight'));
+                        const len = 100 / Math.log(weight * scaleFactor + 1); // Adjust the scaling factor as needed
+                        return len;
+                    }, // sets edge length directly in simulation
+                    nodeDimensionsIncludeLabels: true, // whether labels should be included in determining the space used by a node
+                }).run();
+            
             } catch (error) {
                 console.error("Layout error:", error);
                 console.log("Elements:", elements);
@@ -116,18 +137,19 @@ export default function RelGraph({people, relationships}: {people: Map<number, P
                 width: 1,
                 "line-color": (ele) => {
                     const weight = ele.data('weight');
-                    if (weight <= 0.2) return 'red';
-                    if (weight <= 0.6) return 'orange';
-                    if (weight <= 0.8) return 'yellow';
+                    if (weight <= weights[3]) return 'red';
+                    if (weight <= weights[2]) return 'orange';
+                    if (weight <= weights[1]) return 'yellow';
                     return 'white';
-                },                'line-opacity': 0.9,
+                },                
+                'line-opacity': 0.4,
                 'line-style': 'solid',
                 'curve-style': 'haystack'
             }
             }
         ]}
         layout={{ 
-            name: 'avsdf'
+            name: 'cola'
         }}
         maxZoom={5}
         minZoom={0.5}        
