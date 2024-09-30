@@ -3,7 +3,7 @@
 import * as React from "react"
 
 import { useRef, useEffect, useState, useContext } from 'react';
-import { Person, Relationship } from '@/classes/people';
+import { Family, Person, Relationship } from '@/classes/people';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Cytoscape from 'cytoscape';
@@ -20,7 +20,7 @@ Cytoscape.use( edgehandles );
 // Cytoscape.use(coseBilkent);
 Cytoscape.use(Cola)
 
-export default function RelGraph({people, relationships, weights}: {people: Map<number, Person>, relationships: Map<number, Map<number, number>>, weights: number[]}) {
+export default function RelGraph({people, relationships, weights}: {people: Map<number, Person | Family>, relationships: Map<number, Map<number, number>>, weights: number[]}) {
 
     const [elements, setElements] = useState([]);
     const cy = useRef(null);
@@ -131,6 +131,18 @@ export default function RelGraph({people, relationships, weights}: {people: Map<
                 "text-border-opacity": 100
             }
             },
+            {
+                selector: 'node:parent', // This selector targets compound nodes
+                style: {
+                    'background-color': '#f0f0f0',
+                    'border-color': '#000',
+                    'border-width': 2,
+                    'label': 'data(label)',
+                    'text-valign': 'center',
+                    'text-halign': 'center',
+                    'shape': 'roundrectangle'
+                }
+                },
             {
             selector: 'edge',
             style: {

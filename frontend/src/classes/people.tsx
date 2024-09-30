@@ -3,13 +3,41 @@ export class Person {
     constructor(name: string, isConnected: boolean) {
         this.name = name;
         this.isConnected = isConnected;
+        this.family = null;
     }
 
     name: string;
     isConnected: boolean;
-}
+    family: null | number;
 
-// export class Family
+    addToFamily(familyIndex: number){
+        this.family = familyIndex;
+    }
+
+    removeFromFamily(){
+        this.family = null;
+    }
+}
+export class Family {
+    constructor(name: string) {
+        this.name = name;
+        this.members = new Set;
+    }
+
+    name: string;
+    members: Set<number>;
+
+
+    addToFamily(personIndex: number){
+        this.members.add(personIndex);
+    }
+
+    removeFromFamily(personIndex: number){
+        if (this.members.has(personIndex)){
+            this.members.delete(personIndex)
+        }
+    }
+}
 
 export class AGraph {
     nodes: Person[];

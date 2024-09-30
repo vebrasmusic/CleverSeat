@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef} from "react";
 
 import RelGraph from "@/components/relationships/relGraph";
-import { Person } from "@/classes/people";
+import { Person, Family } from "@/classes/people";
 import { toast } from "sonner"
 import { UserRoundPlus, UserRoundX, Users, Workflow, Upload, UserRoundSearch } from "lucide-react";
 import { MenuButton } from "@/components/ui/menuButton";
@@ -20,10 +20,12 @@ import { Input } from "@/components/ui/input";
 
 
 export default function NewPlan(){
-    const [people, setPeople] = useState<Map<number, Person>>(new Map()); // map [index: Person]
+    const [people, setPeople] = useState<Map<number, Person | Family>>(new Map()); // map [index: Person]
     const [indexCounter, setIndexCounter] = useState(0);
     const [relationships, setRelationships] = useState<Map<number, Map<number, number>>>(new Map()); // Map [sourceIndex: [[targetindex, weight]]]
     const [isEditingName, setisEditingName] = useState<boolean>(false);
+    const [isEditingFamilyName, setIsEditingFamilyName] = useState<boolean>(false);
+    const [familyName, setFamilyName] = useState<string>("");
     const [currentName, setCurrentName] = useState<string>("");
     const [selectedPeople, setSelectedPeople] = useState<Set<number>>(new Set);
     const [isEditingEdgeWeight, setIsEditingEdgeWeight] = useState<boolean>(false);
@@ -61,6 +63,41 @@ export default function NewPlan(){
         }
     }
 
+    function handleFamilyInputEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
+        const name = event.currentTarget.value;
+
+        setFamilyName(name); // Update state
+
+        if (event.key === "Enter") {
+            if (name != '') {
+                addFamily(name); // this spreads the state and adds to it
+                setFamilyName('');
+                event.currentTarget.value = ''; // Clear the input field
+                setIsEditingFamilyName(false);
+            }
+            else {
+                toast.error("Please type in a family name.");
+            }
+        }
+        else if (event.key === "Escape") {
+            setIsEditingFamilyName(false)
+        }
+    }
+
+    function addFamily(name:string){
+        const family = new Family(`The ${name} Family`);
+        const newPeopleMap = new Map(people);
+        const ind = indexCounter;
+        setIndexCounter(indexCounter + 1);
+        newPeopleMap.set(ind, family);
+        setPeople(newPeopleMap);
+
+        const newRelationshipsMap = new Map(relationships);
+        newRelationshipsMap.set(ind, new Map());
+        setRelationships(newRelationshipsMap);
+        toast.success('Added ' + name + ' to the seating plan.');
+    }
+
     function handleSelectEnter(event: React.KeyboardEvent<HTMLInputElement | HTMLButtonElement>) {
         if (event.key === "Enter") {
             if (currentEdgeWeight) {
@@ -68,12 +105,12 @@ export default function NewPlan(){
                 setCurrentEdgeWeight(0.2);
                 setIsEditingEdgeWeight(false)
             }
-            else {
+            else { 
                 toast.error("Please select a relationship type.");
             }
         }
         else if (event.key === "Escape") {
-            setIsEditingEdgeWeight(false)
+            setIsEditingEdgeWeight(false);
         }
     }
 
@@ -93,6 +130,10 @@ export default function NewPlan(){
 
     const onAddButtonClick = () => {
         setisEditingName(true);
+    }
+
+    const onAddFamilyButtonClick = () => {
+        setIsEditingFamilyName(true);
     }
 
     const onRemovePerson = () => {
@@ -210,7 +251,7 @@ export default function NewPlan(){
                         <MenuButton tooltipText="Add new person" onClick={onAddButtonClick}>
                             <UserRoundPlus color="#ffffff"/>
                         </MenuButton>
-                        <MenuButton tooltipText="Add new family">
+                        <MenuButton tooltipText="Add new family" onClick={onAddFamilyButtonClick}>
                             <Users color="#ffffff" />
                         </MenuButton>
                         <MenuButton tooltipText="Add new edge" onClick={onAddEdgeButtonClick}>
@@ -237,8 +278,8 @@ export default function NewPlan(){
                     </div>
                     <div className="flex flex-col gap-2 pb-2 overflow-y-auto h-96"> 
                         {/* this one is the one w the list items */}
-                        {filteredPeople.map(([index, person]) => {
-                            return <ListItem selectListItem={() => {selectListItem(index)}} key={index} person={person}/>;
+                        {filteredPeople.map(([index, node]) => {
+                            return <ListItem selectListItem={() => {selectListItem(index)}} key={index} node={node}/>;
                         })}
                     </div>
                 </div>
@@ -258,7 +299,19 @@ export default function NewPlan(){
                                 </div>
                             </div>
                         );
-                    } else if (isEditingEdgeWeight) {
+                    } 
+                    else if (isEditingFamilyName){
+                            return (
+                                <div className="plan-content-div">
+                                    <input autoFocus className="text-white w-full h-full text-center text-[50px] md:text-[80px] xl:text-[127.88px] bg-transparent border-none outline-none" type="text" placeholder="start typing a name..." defaultValue={currentName} onKeyDown={handleFamilyInputEnter}/>
+                                    <div className="plan-header-item">
+                                        <p className="text-[#D7263D]">Press Enter to save this family.</p>
+                                        <p className="text-[#D7263D]">Press Esc to cancel.</p>
+                                    </div>
+                                </div>
+                            );
+                    }
+                    else if (isEditingEdgeWeight) {
                         return (
                             <form className="plan-content-div">
                                 <Select onValueChange={(value) => {setCurrentEdgeWeight(Number(value))}}>

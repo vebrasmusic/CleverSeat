@@ -1,34 +1,16 @@
 'use client'
 
-import { Person } from "@/classes/people"
-import { Button } from "../ui/button"
-import { useState, useContext, useEffect } from "react";
-import {PeopleContext} from "@/context/peopleContext"
-import { Trash2Icon } from "lucide-react";
-
-  
+import { Person, Family } from "@/classes/people"
+import { useState } from "react";
 
 
-interface ListItemInterface{
-    person: Person
-
-}
-
-const onDeleteClick = () => {
-    // delete this from the main state.
-
-
-    /**
-     * 
-     * 
-     * 
-     * send up the chain message to delete from list
-     */
-}
-
-export const ListItem = ({person, selectListItem}: {person: Person, selectListItem: () => void}) => {
+export const ListItem = ({node, selectListItem}: {node: Person | Family, selectListItem: () => void}) => {
 
     const [isSelected, setIsSelected] = useState(false);
+
+    if (node instanceof Family){
+        
+    }
 
     return (
         <div className="flex flex-row items-center gap-3">
@@ -37,7 +19,7 @@ export const ListItem = ({person, selectListItem}: {person: Person, selectListIt
                 setIsSelected(!isSelected);
                 selectListItem();
              }}>
-                {person.name}
+                {node.name}
             </div>
         </div>
     )

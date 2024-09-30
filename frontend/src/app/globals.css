@@ -238,3 +238,29 @@
   pointer-events: none; /* Prevent the arrow from blocking clicks */
   color: white; /* Adjust color as needed */
 }
+
+.collapsed-border-container > * {
+  position: relative;
+  border-bottom: 4px solid #212529;
+}
+
+/* .collapsed-border-container > *:last-child {
+  border-bottom: none;
+} */
+
+.collapsed-border-container > *::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  left: -4px;
+  display: block;
+  height: 4px;
+  background-color: transparent;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.collapsed-border-container > *:hover::before {
+  opacity: 1;
+}
