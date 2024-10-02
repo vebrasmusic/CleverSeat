@@ -1,20 +1,21 @@
 import { v4 as uuidv4 } from 'uuid';
+import { Person } from './person';
 
 export class Family {
     id: string;
     name: string;
-    members: Set<string>;
+    members: Map<string, Person>; // < personId, Person>
 
-    constructor(name: string) {
-        this.id = uuidv4();
+    constructor(name: string, id: string) {
+        this.id = id;
         this.name = name;
-        this.members = new Set();
+        this.members = new Map();
     }
 
-    addMember(memberId: string) {
-        if (!this.members.has(memberId)){
+    addMember(member: Person) {
+        if (!this.members.has(member.id)){
             try {
-                this.members.add(memberId);
+                this.members.set(member.id, member);
             } catch (error) {
                 console.error(error);
                 throw error;

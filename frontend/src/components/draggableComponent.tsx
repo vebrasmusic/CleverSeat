@@ -1,7 +1,6 @@
 import React, { ReactNode } from "react";
 
 import { useDraggable } from "@dnd-kit/core";
-import {CSS} from "@dnd-kit/utilities"
 import DragWrapper from "./dragWrapper";
 
 interface DraggableProps {
@@ -13,7 +12,11 @@ interface DraggableProps {
 
 export default function DraggableComponent({id, name, children, inFamily}:DraggableProps) {
     const {attributes, listeners, setNodeRef} = useDraggable({
-        id: id
+        id: id,
+        data: {
+            name: name
+        }
+
     })
 
     return (

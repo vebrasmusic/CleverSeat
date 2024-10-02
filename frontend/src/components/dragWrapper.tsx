@@ -14,8 +14,8 @@ interface DragWrapperProps extends React.ComponentPropsWithRef<'div'> {
 export default function DragWrapper({name, isActive, children, inFamily, ...props}: DragWrapperProps) {
     
     return (
-        <div {...props} className={`${isActive ? 'border-black bg-[#517664] text-white' : 'border-[#212529] bg-white text-[#212529]'} ${inFamily ? 'border-0' : 'border-4 shadow-md'} hover:border-[#517664] hover:text-white flex flex-row justify-between p-2 items-center align-middle h-20 w-[200px] rounded-lg`}>
-            <div>
+        <div {...props} className={`${isActive ? 'border-black bg-[#517664] text-white' : 'border-[#212529] bg-white text-[#212529]'} ${inFamily ? 'border-0' : 'border-4 shadow-md'} hover:border-[#517664] hover:text-white flex flex-row justify-between p-4 items-center align-middle h-32 w-[500px] rounded-lg`}>
+            <div className="text-[2.488rem]">
                 {name}
             </div>
             {children}
